@@ -1,0 +1,64 @@
+import { PrismaClient } from "@prisma/client";
+import { sendMail as triggerEmail } from "../common/nodemailer";
+
+const db = new PrismaClient();
+
+/**
+ * Automatically notifies staff and handles restocking of a book when only 1 copy remains.
+ */
+export const evaluateAndReplenishStock = async (resourceId: string) => {
+  const resource = await db.book.findUnique({ where: { id: resourceId } });
+  if (!resource) return;
+
+  if (resource.currentCopies === 1) {
+    console.log(`[NOTIFY] Email sent to: ops@library.org`);
+    console.log(`Subject: Reorder Needed - "${resource.title}"`);
+    console.log(`Body: Inventory low. Only one copy left.`);
+
+    await triggerEmail(
+      "ops@library.org",
+      `Replenish Inventory - "${resource.title}"`,
+      `Please initiate restocking for "${resource.title}". Only one copy is available.`
+    );
+
+    const delayForReplenishment = 3 * 24 * 60 * 60 * 1000; // 3 days
+
+    setTimeout(async () => {
+      const deficit = resource.initialStock - resource.currentCopies;
+      if (deficit > 0) {
+        // Restore stock
+        await db.book.update({
+          where: { id: resource.id },
+          data: {
+            currentCopies: { increment: deficit },
+          },
+        });
+
+        // Log stock action
+        await db.bookAction.create({
+          data: {
+            bookId: resource.id,
+            actionType: "STOCK",
+            userEmail: "auto-restock@library.system",
+          },
+        });
+
+        // Deduct wallet balance
+        const replenishmentCost = resource.stockPrice * deficit;
+        await db.wallet.update({
+          where: { id: 1 },
+          data: {
+            balance: { decrement: replenishmentCost },
+            transactions: {
+              create: {
+                type: "DEBIT",
+                amount: replenishmentCost,
+                reason: `Auto-restocked "${resource.title}" (${deficit} units)`,
+              },
+            },
+          },
+        });
+      }
+    }, delayForReplenishment);
+  }
+};
