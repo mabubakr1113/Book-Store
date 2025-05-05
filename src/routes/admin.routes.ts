@@ -71,6 +71,8 @@ router.get("/wallet/balance", async (req, res) => {
       .send({ error: "An error occurred while fetching the wallet." });
   }
 });
+
+//fetch transactions history
 router.get("/wallet/transactios", async (req, res) => {
   try {
     await getTransactions(req, res);
