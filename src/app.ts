@@ -13,7 +13,7 @@ app.use("/admin", adminCheck, adminRoutes);
 app.use("/transactions", transactionsRoutes);
 
 app.get("/", (req, res) => {
-  res.send("App is running is running");
+  res.send("App is running ");
 });
 
 export default app;

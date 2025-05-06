@@ -85,8 +85,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/admin/book?search=Fiction",
-              "protocol": "http",
+              "raw": "{{hostName}}/admin/book?search=Fiction",
               "host": ["{{hostName}}"],
               "path": ["admin", "book"],
               "query": [
@@ -111,10 +110,9 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/admin/book/9c219d3e-21c1-472c-a72a-42aae7f24fe4",
-              "protocol": "http",
+              "raw": "{{hostName}}/admin/book/b0930bef-50af-4e53-aa62-94eb19d2bd9c",
               "host": ["{{hostName}}"],
-              "path": ["admin", "book", "9c219d3e-21c1-472c-a72a-42aae7f24fe4"]
+              "path": ["admin", "book", "b0930bef-50af-4e53-aa62-94eb19d2bd9c"]
             }
           },
           "response": []
@@ -131,8 +129,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/admin/book/logs?type=borrow",
-              "protocol": "http",
+              "raw": "{{hostName}}/admin/book/logs?type=borrow",
               "host": ["{{hostName}}"],
               "path": ["admin", "book", "logs"],
               "query": [
@@ -157,8 +154,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/admin/book/users",
-              "protocol": "http",
+              "raw": "{{hostName}}/admin/book/users",
               "host": ["{{hostName}}"],
               "path": ["admin", "book", "users"]
             }
@@ -182,8 +178,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/admin/wallet/balance",
-              "protocol": "http",
+              "raw": "{{hostName}}/admin/wallet/balance",
               "host": ["{{hostName}}"],
               "path": ["admin", "wallet", "balance"]
             }
@@ -202,7 +197,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/admin/wallet/transactios",
+              "raw": "{{hostName}}/admin/wallet/transactios",
               "protocol": "http",
               "host": ["{{hostName}}"],
               "path": ["admin", "wallet", "transactios"]
@@ -227,8 +222,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/transactions/borrow/9c219d3e-21c1-472c-a72a-42aae7f24fe4",
-              "protocol": "http",
+              "raw": "{{hostName}}/transactions/borrow/9c219d3e-21c1-472c-a72a-42aae7f24fe4",
               "host": ["{{hostName}}"],
               "path": [
                 "transactions",
@@ -258,8 +252,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/transactions/purchase/9c219d3e-21c1-472c-a72a-42aae7f24fe4",
-              "protocol": "http",
+              "raw": "{{hostName}}/transactions/purchase/9c219d3e-21c1-472c-a72a-42aae7f24fe4",
               "host": ["{{hostName}}"],
               "path": [
                 "transactions",
@@ -282,8 +275,7 @@
               }
             ],
             "url": {
-              "raw": "http://{{hostName}}/transactions/return/9c219d3e-21c1-472c-a72a-42aae7f24fe4",
-              "protocol": "http",
+              "raw": "{{hostName}}/transactions/return/9c219d3e-21c1-472c-a72a-42aae7f24fe4",
               "host": ["{{hostName}}"],
               "path": [
                 "transactions",
