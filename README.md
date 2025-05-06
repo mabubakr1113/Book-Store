@@ -2,6 +2,8 @@
 
 This is a backend API built with **Node.js**, **Express**, and **Prisma ORM**, designed to manage a digital book store. It supports operations like borrowing, buying, and returning books, handling stock and wallet transactions, and providing administrative summaries.
 
+**Backend is deployed at:** [https://book-store-production-61e1.up.railway.app/](https://book-store-production-61e1.up.railway.app/)
+
 ---
 
 ## 🚀 Features
@@ -43,51 +45,57 @@ This is a backend API built with **Node.js**, **Express**, and **Prisma ORM**, d
 
 ## 📁 Folder Structure
 
+```
 prisma/
 src/
-├── controllers/ // Route logic
-├── services/ // Business logic
-├── routes/ // Express routes
-├── common/ // Helpers (e.g., mailer)
-└── app.ts // Express app setup
+├── controllers/  Route logic
+├── services/  Business logic
+├── routes/  Express routes
+├── common/  Helpers (e.g., mailer)
+└── app.ts  Express app setup
+```
 
 ---
 
 ## ⚙️ Getting Started
 
 ### 1. Clone the repository
-
-git clone https://github.com/mabubakr1113/book-store
+```bash
+git clone https://github.com/mabubakr1113/book-store  
 cd book-store
+```
 
 ### 2. Install dependencies
-
+```bash
 npm install
-
+```
 ### 3. Configure environment variables
 
 Create a .env file in the root and add:
 
-DATABASE_URL="postgresql://postgres:postgree@localhost:5432/book-store"
-PORT=3000
-EMAIL_SERVICE_SMTP=smtp.sendgrid.net
-EMAIL_SERVICE_PORT=465
-EMAIL_SERVICE_USER=user
-EMAIL_SERVICE_PASSWORD=password
-EMAIL_SERVICE_SENDER_EMAIL=emailid
+DATABASE_URL="postgresql://postgres:postgree@localhost:5432/book-store"  
+PORT=3000  
+EMAIL_SERVICE_SMTP=smtp.sendgrid.net  
+EMAIL_SERVICE_PORT=465  
+EMAIL_SERVICE_USER=user  
+EMAIL_SERVICE_PASSWORD=password  
+EMAIL_SERVICE_SENDER_EMAIL=emailid  
 
 ### 4. Setup the database
-
+```bash
 npx prisma migrate dev --name init
 npm run seed
+```
 
 ### 5. Run the server
-
+```bash
 npm run dev
-🧪 Running Tests
-Run unit/integration tests with:
-
+```
+### 6. Running Tests  
+Run unit/integration tests with:  
+```bash
 npm jest
+``` 
 Test suites cover:
 
 Book borrowing/returning
@@ -112,10 +120,10 @@ Wallet balance exceeds $2000
 You can run this project using Docker for an easier setup and deployment process.
 
 1. Build the Docker image
-
-docker build -t book-store . 2. Run the Docker container
-
+```bash
+docker build -t book-store . 2. Run the Docker container  
 docker-compose up
+```
 This will run the app and database inside Docker containers.
 
 ## 📌 API Endpoints Overview
