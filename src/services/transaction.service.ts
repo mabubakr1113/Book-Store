@@ -20,7 +20,7 @@ export const handleBorrowBook = async (
     });
     if (existing) return { status: 400, body: { error: "Already borrowed" } };
 
-    const totalBorrowed = await prisma.userBook.count({ where: { userEmail } });
+    const totalBorrowed = await prisma.userBook.count({ where: { userEmail,actionType: ActionType.BORROW } });
     if (totalBorrowed >= 3)
       return { status: 400, body: { error: "Limit 3 books" } };
 
