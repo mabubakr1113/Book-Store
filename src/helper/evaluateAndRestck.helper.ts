@@ -21,7 +21,7 @@ export const evaluateAndReplenishStock = async (resourceId: string) => {
       `Please initiate restocking for "${resource.title}". Only one copy is available.`
     );
 
-    const delayForReplenishment = 3 * 24 * 60 * 60 * 1000; // 3 days
+    const delayForReplenishment = 60 * 60 * 1000; // 1 hour
 
     setTimeout(async () => {
       const deficit = resource.initialStock - resource.currentCopies;
