@@ -94,7 +94,7 @@ npm run dev
 ### 6. Running Tests  
 Run unit/integration tests with:  
 ```bash
-npm jest
+npm run test
 ``` 
 Test suites cover:
 
@@ -121,7 +121,8 @@ You can run this project using Docker for an easier setup and deployment process
 
 1. Build the Docker image
 ```bash
-docker build -t book-store . 2. Run the Docker container  
+docker build -t book-store . 
+2. Run the Docker container  
 docker-compose up
 ```
 This will run the app and database inside Docker containers.
