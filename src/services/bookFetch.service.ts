@@ -1,4 +1,5 @@
 import { Book, PrismaClient, Prisma } from "@prisma/client";
+import { getCachedBooks, setCachedBooks, generateCacheKey } from "./redis.service";
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,13 @@ export const searchBooks = async (
   options: SearchOptions = {}
 ): Promise<{ books: Book[]; total: number }> => {
   const { limit = 50, page = 1, getAll = false, genres } = options;
+
+  // Try to get from cache first
+  const cacheKey = generateCacheKey(search, options);
+  const cachedResult = await getCachedBooks(cacheKey);
+  if (cachedResult) {
+    return cachedResult;
+  }
   
   // Base query conditions
   const whereConditions: Prisma.BookWhereInput = !search.trim() ? {} : {
@@ -77,10 +85,15 @@ export const searchBooks = async (
     })
   });
 
-  return {
+  const result = {
     books,
     total
   };
+
+  // Cache the result
+  await setCachedBooks(cacheKey, result);
+
+  return result;
 };
 
 export const getBookByIdService = async (id: string): Promise<Book | null> => {

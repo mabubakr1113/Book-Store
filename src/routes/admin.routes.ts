@@ -6,8 +6,22 @@ import {
   getTransactions,
   userLibrarySummaryHandler,
   bookLogsHandler,
+  checkRedisHealth,
 } from "../controllers/admin.controller";
 const router = express.Router();
+
+// Redis health check
+router.get("/redis/health", async (req, res) => {
+  try {
+    await checkRedisHealth(req, res);
+  } catch (error) {
+    res.status(500).send({
+      error: "Redis health check failed",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
 // fetch all books
 router.get("/book", async (req, res) => {
   try {

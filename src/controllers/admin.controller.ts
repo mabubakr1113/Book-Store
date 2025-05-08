@@ -8,6 +8,7 @@ import {
   summarizeUserHoldings,
   fetchBookActivityLogs,
 } from "../services/activity.service";
+import { redis } from "../services/redis.service";
 
 export const getBooks = async (req: Request, res: Response) => {
   const search = req.query.search?.toString().trim().toLowerCase() || "";
@@ -109,5 +110,33 @@ export const userLibrarySummaryHandler = async (
   } catch (err) {
     console.error("Summary generation error:", err);
     res.status(500).json({ error: "Unable to generate user library summary" });
+  }
+};
+
+export const checkRedisHealth = async (req: Request, res: Response) => {
+  try {
+    // Test Redis connection
+    await redis.ping();
+    
+    // Test Redis write
+    await redis.set('test_key', 'test_value');
+    const testValue = await redis.get('test_key');
+    await redis.del('test_key');
+
+    res.json({
+      status: 'healthy',
+      message: 'Redis connection is working',
+      test: {
+        ping: 'PONG',
+        write: testValue === 'test_value'
+      }
+    });
+  } catch (error) {
+    console.error('Redis health check failed:', error);
+    res.status(500).json({
+      status: 'unhealthy',
+      message: 'Redis connection failed',
+      error: error instanceof Error ? error.message : String(error)
+    });
   }
 };
