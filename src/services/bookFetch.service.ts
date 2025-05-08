@@ -1,24 +1,98 @@
-import { Book, PrismaClient } from "@prisma/client";
+import { Book, PrismaClient, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const searchBooks = async (search: string): Promise<Book[]> => {
-  const lowerSearch = search.toLowerCase();
+interface SearchOptions {
+  limit?: number;
+  page?: number;
+  getAll?: boolean;
+  genres?: string[];
+}
 
-  const books = await prisma.book.findMany();
+export const searchBooks = async (
+  search: string,
+  options: SearchOptions = {}
+): Promise<{ books: Book[]; total: number }> => {
+  const { limit = 50, page = 1, getAll = false, genres } = options;
+  
+  // Base query conditions
+  const whereConditions: Prisma.BookWhereInput = !search.trim() ? {} : {
+    OR: [
+      {
+        title: {
+          contains: search,
+          mode: Prisma.QueryMode.insensitive
+        }
+      },
+      {
+        authorList: {
+          hasSome: search.toLowerCase().split(' ').map(term => term.trim()).filter(Boolean)
+        }
+      },
+      {
+        genreList: {
+          hasSome: search.toLowerCase().split(' ').filter(Boolean)
+        }
+      },
+      {
+        publisher: {
+          contains: search,
+          mode: Prisma.QueryMode.insensitive
+        }
+      },
+      {
+        isbn: {
+          contains: search,
+          mode: Prisma.QueryMode.insensitive
+        }
+      }
+    ]
+  };
 
-  return books.filter(
-    (book: Book) =>
-      book.title.toLowerCase().includes(lowerSearch) ||
-      book.authorList.some((author: string) =>
-        author.toLowerCase().includes(lowerSearch)
-      ) ||
-      book.genreList.some((genre: string) =>
-        genre.toLowerCase().includes(lowerSearch)
-      )
-  );
+  // Add genre filter if provided
+  if (genres && genres.length > 0) {
+    whereConditions.AND = [
+      {
+        genreList: {
+          hasSome: genres
+        }
+      }
+    ];
+  }
+
+  // Get total count
+  const total = await prisma.book.count({ where: whereConditions });
+
+  // Get books with pagination
+  const books = await prisma.book.findMany({
+    where: whereConditions,
+    orderBy: [
+      {
+        title: 'asc'
+      }
+    ],
+    ...(getAll ? {} : {
+      take: limit,
+      skip: (page - 1) * limit
+    })
+  });
+
+  return {
+    books,
+    total
+  };
 };
 
 export const getBookByIdService = async (id: string): Promise<Book | null> => {
-  return prisma.book.findUnique({ where: { id } });
+  return prisma.book.findUnique({ 
+    where: { id },
+    include: {
+      actions: {
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 10 // Get only recent actions
+      }
+    }
+  });
 };

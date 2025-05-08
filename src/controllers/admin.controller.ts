@@ -11,10 +11,22 @@ import {
 
 export const getBooks = async (req: Request, res: Response) => {
   const search = req.query.search?.toString().trim().toLowerCase() || "";
+  const limit = req.query.limit ? parseInt(req.query.limit.toString()) : undefined;
+  const page = req.query.page ? parseInt(req.query.page.toString()) : undefined;
+  const getAll = req.query.getAll === 'true';
+  const genres = req.query.genres?.toString().split(',').map(g => g.trim()) || [];
 
   try {
-    const books = await searchBooks(search);
-    res.json(books);
+    const result = await searchBooks(search, { limit, page, getAll, genres });
+    res.json({
+      books: result.books,
+      pagination: {
+        total: result.total,
+        page: page || 1,
+        limit: limit || 50,
+        totalPages: Math.ceil(result.total / (limit || 50))
+      }
+    });
   } catch (error) {
     console.error("Search error:", error);
     res.status(500).json({

@@ -27,6 +27,11 @@ model Book {
 
   actions   BookAction[]
   userBooks UserBook[]
+
+  @@index([title])
+  @@index([isbn])
+  @@index([publisher])
+  @@index([publishedYear])
 }
 
 model Wallet {

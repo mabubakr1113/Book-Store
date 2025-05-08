@@ -25,5 +25,14 @@ services:
       - .env
     command: sh -c "npx prisma migrate deploy && npm run start"
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --requirepass your_redis_password
+
 volumes:
   postgres_data:
+  redis_data:

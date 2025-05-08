@@ -73,7 +73,7 @@ router.get("/wallet/balance", async (req, res) => {
 });
 
 //fetch transactions history
-router.get("/wallet/transactios", async (req, res) => {
+router.get("/wallet/transactions", async (req, res) => {
   try {
     await getTransactions(req, res);
   } catch (error) {
