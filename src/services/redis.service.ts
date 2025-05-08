@@ -1,14 +1,45 @@
 import Redis from 'ioredis';
 import { Book } from '@prisma/client';
 
+// Create Redis client with reconnection strategy
 export const redis = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD || 'your_redis_password',
+  retryStrategy: (times) => {
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+  maxRetriesPerRequest: 3,
+  enableReadyCheck: true,
+  reconnectOnError: (err) => {
+    const targetError = 'READONLY';
+    if (err.message.includes(targetError)) {
+      return true;
+    }
+    return false;
+  }
 });
 
 // Cache TTL in seconds (1 hour)
 const CACHE_TTL = 3600;
+
+// Handle Redis events
+redis.on('connect', () => {
+  console.log('[REDIS] Connected to Redis server');
+});
+
+redis.on('error', (error) => {
+  console.error('[REDIS] Error:', error);
+});
+
+redis.on('reconnecting', () => {
+  console.log('[REDIS] Reconnecting to Redis server...');
+});
+
+redis.on('ready', () => {
+  console.log('[REDIS] Redis client ready');
+});
 
 const serializeBook = (book: Book): any => ({
   ...book,
@@ -34,7 +65,7 @@ export const getCachedBooks = async (key: string): Promise<{ books: Book[]; tota
     }
     return null;
   } catch (error) {
-    console.error('Redis get error:', error);
+    console.error('[REDIS] Get error:', error);
     return null;
   }
 };
@@ -50,7 +81,7 @@ export const setCachedBooks = async (
     };
     await redis.setex(key, CACHE_TTL, JSON.stringify(serializedData));
   } catch (error) {
-    console.error('Redis set error:', error);
+    console.error('[REDIS] Set error:', error);
   }
 };
 
@@ -69,6 +100,6 @@ export const clearBookCache = async (): Promise<void> => {
       await redis.del(...keys);
     }
   } catch (error) {
-    console.error('Redis clear cache error:', error);
+    console.error('[REDIS] Clear cache error:', error);
   }
 }; 

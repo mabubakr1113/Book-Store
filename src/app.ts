@@ -1,16 +1,15 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
-import adminRoutes from "./routes/admin.routes";
-import transactionsRoutes from "./routes/transaction.routes";
-import { adminCheck } from "./middlewares/adminAuth";
+import adminRoutes from "./routes/admin";
+import transactionRoutes from "./routes/transaction.routes";
 
 const app = express();
 app.use(express.json());
 
-app.use("/admin", adminCheck, adminRoutes);
+app.use("/admin", adminRoutes);
 
-app.use("/transactions", transactionsRoutes);
+app.use("/transactions", transactionRoutes);
 
 app.get("/", (req, res) => {
   res.send("App is running ");

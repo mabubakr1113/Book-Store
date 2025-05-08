@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { sendMail as triggerEmail } from "../common/nodemailer";
+import { scheduleLowStockNotification, scheduleRestock } from "../services/queue.service";
 
 const db = new PrismaClient();
 
@@ -21,44 +22,10 @@ export const evaluateAndReplenishStock = async (resourceId: string) => {
       `Please initiate restocking for "${resource.title}". Only one copy is available.`
     );
 
-    const delayForReplenishment = 60 * 60 * 1000; // 1 hour
-
-    setTimeout(async () => {
-      const deficit = resource.initialStock - resource.currentCopies;
-      if (deficit > 0) {
-        // Restore stock
-        await db.book.update({
-          where: { id: resource.id },
-          data: {
-            currentCopies: { increment: deficit },
-          },
-        });
-
-        // Log stock action
-        await db.bookAction.create({
-          data: {
-            bookId: resource.id,
-            actionType: "STOCK",
-            userEmail: "auto-restock@library.system",
-          },
-        });
-
-        // Deduct wallet balance
-        const replenishmentCost = resource.stockPrice * deficit;
-        await db.wallet.update({
-          where: { id: 1 },
-          data: {
-            balance: { decrement: replenishmentCost },
-            transactions: {
-              create: {
-                type: "DEBIT",
-                amount: replenishmentCost,
-                reason: `Auto-restocked "${resource.title}" (${deficit} units)`,
-              },
-            },
-          },
-        });
-      }
-    }, delayForReplenishment);
+    // Schedule low stock notification
+    await scheduleLowStockNotification(resource);
+    
+    // Schedule automatic restock
+    await scheduleRestock(resource);
   }
 };

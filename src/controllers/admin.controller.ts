@@ -9,6 +9,7 @@ import {
   fetchBookActivityLogs,
 } from "../services/activity.service";
 import { redis } from "../services/redis.service";
+import { emailQueue, restockQueue } from "../services/queue.service";
 
 export const getBooks = async (req: Request, res: Response) => {
   const search = req.query.search?.toString().trim().toLowerCase() || "";
@@ -137,6 +138,41 @@ export const checkRedisHealth = async (req: Request, res: Response) => {
       status: 'unhealthy',
       message: 'Redis connection failed',
       error: error instanceof Error ? error.message : String(error)
+    });
+  }
+};
+
+export const checkQueueStatus = async (req: Request, res: Response) => {
+  try {
+    const [emailJobs, restockJobs] = await Promise.all([
+      emailQueue.getJobCounts(),
+      restockQueue.getJobCounts()
+    ]);
+
+    const emailQueueStatus = await emailQueue.getJobCounts();
+    const restockQueueStatus = await restockQueue.getJobCounts();
+
+    res.json({
+      emailQueue: {
+        waiting: emailQueueStatus.waiting,
+        active: emailQueueStatus.active,
+        completed: emailQueueStatus.completed,
+        failed: emailQueueStatus.failed,
+        delayed: emailQueueStatus.delayed
+      },
+      restockQueue: {
+        waiting: restockQueueStatus.waiting,
+        active: restockQueueStatus.active,
+        completed: restockQueueStatus.completed,
+        failed: restockQueueStatus.failed,
+        delayed: restockQueueStatus.delayed
+      }
+    });
+  } catch (error) {
+    console.error("Queue status check error:", error);
+    res.status(500).json({
+      error: "Failed to check queue status",
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 };
